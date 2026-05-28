@@ -25,7 +25,7 @@
 # Run
 #   docker run --rm -it nirjas <args>
 
-FROM python:3.8-alpine as builder
+FROM python:3.10-alpine as builder
 
 WORKDIR /nirjas
 
@@ -33,7 +33,7 @@ COPY . .
 
 RUN python3 -m pip wheel --wheel-dir wheels .
 
-FROM python:3.8-alpine
+FROM python:3.10-alpine
 
 ARG user=nirjas
 ARG group=nirjas
