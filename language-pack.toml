@@ -25,7 +25,6 @@ languages = [
     "rust",
     "scala",
     "scss",
-    "shell",
     "sql",
     "swift",
     "typescript",

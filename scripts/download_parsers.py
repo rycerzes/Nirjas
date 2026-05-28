@@ -17,6 +17,14 @@ from pathlib import Path
 from tree_sitter_language_pack import download
 
 
+_LANGUAGE_ALIASES = {
+    "c#": "csharp",
+    "c_sharp": "csharp",
+    "shell": "bash",
+    "shellscript": "bash",
+}
+
+
 class ParserDownloadError(Exception):
     """Raised when parser download config is invalid or download fails."""
 
@@ -47,17 +55,35 @@ def parse_language_config(config_path: Path) -> list[str]:
     return languages
 
 
+def normalize_language_names(language_names: list[str]) -> list[str]:
+    """Normalize aliases and deduplicate while preserving order."""
+
+    normalized_names: list[str] = []
+    seen_languages: set[str] = set()
+
+    for language_name in language_names:
+        normalized_name = _LANGUAGE_ALIASES.get(language_name, language_name)
+        if normalized_name in seen_languages:
+            continue
+        normalized_names.append(normalized_name)
+        seen_languages.add(normalized_name)
+
+    return normalized_names
+
+
 def download_parsers(config_path: Path) -> int:
     """Download parser bundles from config file and return count."""
 
-    language_names = parse_language_config(config_path)
+    configured_language_names = parse_language_config(config_path)
+    language_names = normalize_language_names(configured_language_names)
 
     try:
         downloaded = download(language_names)
     except Exception as exc:  # pragma: no cover - depends on network/runtime
         raise ParserDownloadError(
             "Failed to download Tree-Sitter parsers. "
-            f"Languages: {language_names}. Error: {exc}"
+            f"Configured: {configured_language_names}. "
+            f"Normalized: {language_names}. Error: {exc}"
         ) from exc
 
     return downloaded
