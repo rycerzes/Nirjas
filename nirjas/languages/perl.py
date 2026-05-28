@@ -21,8 +21,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from nirjas.binder import CommentSyntax, contSingleLines
-from nirjas.output import ScanOutput, SingleLine, MultiLine
+
+from nirjas.languages._base import extract_with_tree_sitter
 
 
 def perlExtractor(file):
@@ -33,43 +33,15 @@ def perlExtractor(file):
     :return: Scan output
     :rtype: ScanOutput
     """
-    result = CommentSyntax()
-    single_line_comment = result.hash(file)
-    multiline_comment = result.beginCut(file)
-    cont_single_line_comment = contSingleLines(single_line_comment)
-    file = file.split("/")
-    output = ScanOutput()
-    output.filename = file[-1]
-    output.lang = "Perl"
-    output.total_lines = single_line_comment[1]
-    output.total_lines_of_comments = single_line_comment[3] + multiline_comment[3]
-    output.blank_lines = single_line_comment[2]
-
-    if cont_single_line_comment:
-        single_line_comment = cont_single_line_comment[0]
-
-    for i in single_line_comment[0]:
-        output.single_line_comment.append(SingleLine(i[0], i[1]))
-
-    for idx, i in enumerate(cont_single_line_comment[1]):
-        output.cont_single_line_comment.append(
-            MultiLine(
-                cont_single_line_comment[1][idx],
-                cont_single_line_comment[2][idx],
-                cont_single_line_comment[3][idx],
-            )
-        )
-
-    for idx, i in enumerate(multiline_comment[0]):
-        output.multi_line_comment.append(
-            MultiLine(
-                multiline_comment[0][idx],
-                multiline_comment[1][idx],
-                multiline_comment[2][idx],
-            )
-        )
-
-    return output
+    return extract_with_tree_sitter(
+        file_path=file,
+        display_language='Perl',
+        parser_language='perl',
+        single_line_prefixes=['#'],
+        multi_line_delimiters=[('=begin', '=cut'), ('=pod', '=cut')],
+        extra_comment_node_kinds=['pod'],
+        force_multi_line_node_kinds=['pod'],
+    )
 
 
 def perlSource(file, new_file: str):

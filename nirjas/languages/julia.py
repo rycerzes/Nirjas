@@ -20,86 +20,28 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from nirjas.binder import CommentSyntax, contSingleLines
-from nirjas.output import ScanOutput, SingleLine, MultiLine
+
+from nirjas.languages._base import extract_with_tree_sitter
 
 
 def juliaExtractor(file):
     """
-    Extract comments from julia file.
+    Extract comments from Julia file.
     :param file: File to scan
     :type file: string
     :return: Scan output
     :rtype: ScanOutput
     """
-    result = CommentSyntax()
-    single_line_comment = result.hash(file)
-    multiline_single_comment = result.singleQuotes(file)
-    multiline_double_comment = result.doubleQuotes(file)
-    multiline_hashEqual_comment = result.hashEqual(file)
-    cont_single_line_comment = contSingleLines(single_line_comment)
-    file = file.split("/")
-    output = ScanOutput()
-    output.filename = file[-1]
-    output.lang = "Julia"
-    output.total_lines = single_line_comment[1]
-    output.total_lines_of_comments = (
-        single_line_comment[3] + multiline_single_comment[3] + multiline_double_comment[3] + multiline_hashEqual_comment[3]
+    return extract_with_tree_sitter(
+        file_path=file,
+        display_language='Julia',
+        parser_language='julia',
+        single_line_prefixes=['#'],
+        multi_line_delimiters=[('#=', '=#'), ("'''", "'''"), ('"""', '"""')],
+        docstring_node_kinds=['string_literal'],
+        docstring_parent_kinds=['source_file', 'block'],
+        docstring_delimiters=[("'''", "'''"), ('"""', '"""')],
     )
-    output.blank_lines = single_line_comment[2]
-
-    if cont_single_line_comment:
-        single_line_comment = cont_single_line_comment[0]
-
-    for i in single_line_comment[0]:
-        output.single_line_comment.append(SingleLine(i[0], i[1]))
-
-    for idx, _ in enumerate(cont_single_line_comment[1]):
-        output.cont_single_line_comment.append(
-            MultiLine(
-                cont_single_line_comment[1][idx],
-                cont_single_line_comment[2][idx],
-                cont_single_line_comment[3][idx],
-            )
-        )
-
-    try:
-        for idx, _ in enumerate(multiline_single_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_single_comment[0][idx],
-                    multiline_single_comment[1][idx],
-                    multiline_single_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    try:
-        for idx, _ in enumerate(multiline_double_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_double_comment[0][idx],
-                    multiline_double_comment[1][idx],
-                    multiline_double_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    try:
-        for idx, _ in enumerate(multiline_hashEqual_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_hashEqual_comment[0][idx],
-                    multiline_hashEqual_comment[1][idx],
-                    multiline_hashEqual_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    return output
 
 
 def juliaSource(file, new_file: str):

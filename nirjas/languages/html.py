@@ -21,8 +21,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from nirjas.binder import CommentSyntax
-from nirjas.output import ScanOutput, MultiLine
+
+from nirjas.languages._base import extract_with_tree_sitter
 
 
 def htmlExtractor(file):
@@ -33,44 +33,13 @@ def htmlExtractor(file):
     :return: Scan output
     :rtype: ScanOutput
     """
-    result = CommentSyntax()
-    multiline_dash_comment = result.gtExclamationDash(file)
-    multiline_star_comment = result.slashStar(file)
-    file = file.split("/")
-    output = ScanOutput()
-    output.filename = file[-1]
-    output.lang = "HTML"
-    output.total_lines = multiline_dash_comment[4]
-    output.total_lines_of_comments = (
-        multiline_dash_comment[3] + multiline_star_comment[3]
+    return extract_with_tree_sitter(
+        file_path=file,
+        display_language='HTML',
+        parser_language='html',
+        single_line_prefixes=[],
+        multi_line_delimiters=[('<!--', '-->'), ('/*', '*/')],
     )
-    output.blank_lines = multiline_dash_comment[5]
-
-    try:
-        for idx, _ in enumerate(multiline_dash_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_dash_comment[0][idx],
-                    multiline_dash_comment[1][idx],
-                    multiline_dash_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    try:
-        for idx, _ in enumerate(multiline_star_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_star_comment[0][idx],
-                    multiline_star_comment[1][idx],
-                    multiline_star_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    return output
 
 
 def htmlSource(file, new_file: str):

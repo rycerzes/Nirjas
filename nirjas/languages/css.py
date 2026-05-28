@@ -21,8 +21,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from nirjas.binder import CommentSyntax
-from nirjas.output import ScanOutput, MultiLine
+
+from nirjas.languages._base import extract_with_tree_sitter
 
 
 def cssExtractor(file):
@@ -33,29 +33,13 @@ def cssExtractor(file):
     :return: Scan output
     :rtype: ScanOutput
     """
-    result = CommentSyntax()
-    multiline_comment = result.slashStar(file)
-    file = file.split("/")
-    output = ScanOutput()
-    output.filename = file[-1]
-    output.lang = "CSS"
-    output.total_lines = multiline_comment[4]
-    output.total_lines_of_comments = multiline_comment[3]
-    output.blank_lines = multiline_comment[5]
-
-    try:
-        for idx, _ in enumerate(multiline_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_comment[0][idx],
-                    multiline_comment[1][idx],
-                    multiline_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    return output
+    return extract_with_tree_sitter(
+        file_path=file,
+        display_language='CSS',
+        parser_language='css',
+        single_line_prefixes=[],
+        multi_line_delimiters=[('/*', '*/')],
+    )
 
 
 def cssSource(file, new_file: str):

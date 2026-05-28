@@ -21,8 +21,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from nirjas.binder import CommentSyntax
-from nirjas.output import ScanOutput, SingleLine
+
+from nirjas.languages._base import extract_with_tree_sitter
 
 
 def rExtractor(file):
@@ -33,20 +33,14 @@ def rExtractor(file):
     :return: Scan output
     :rtype: ScanOutput
     """
-    result = CommentSyntax()
-    single_line_comment = result.hash(file)
-    file = file.split("/")
-    output = ScanOutput()
-    output.filename = file[-1]
-    output.lang = "R"
-    output.total_lines = single_line_comment[1]
-    output.total_lines_of_comments = single_line_comment[3]
-    output.blank_lines = single_line_comment[2]
-
-    for i in single_line_comment[0]:
-        output.single_line_comment.append(SingleLine(i[0], i[1]))
-
-    return output
+    return extract_with_tree_sitter(
+        file_path=file,
+        display_language='R',
+        parser_language='r',
+        single_line_prefixes=['#'],
+        multi_line_delimiters=[],
+        group_single_line_comments=False,
+    )
 
 
 def rSource(file, new_file: str):

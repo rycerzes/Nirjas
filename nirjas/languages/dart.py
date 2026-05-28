@@ -20,8 +20,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from nirjas.binder import CommentSyntax, contSingleLines
-from nirjas.output import ScanOutput, SingleLine, MultiLine
+
+from nirjas.languages._base import extract_with_tree_sitter
 
 
 def dartExtractor(file):
@@ -32,65 +32,13 @@ def dartExtractor(file):
     :return: Scan output
     :rtype: ScanOutput
     """
-    result = CommentSyntax()
-    single_line_comment = result.doubleNotTripleSlash(file)
-    doc_comment = result.tripleSlash(file)
-    multiline_comment = result.slashStar(file)
-    cont_single_line_comment = contSingleLines(single_line_comment)
-    cont_doc_line_comment = contSingleLines(doc_comment)
-    file = file.split("/")
-    output = ScanOutput()
-    output.filename = file[-1]
-    output.lang = "Dart"
-    output.total_lines = single_line_comment[1]
-    output.total_lines_of_comments = (
-        single_line_comment[3] + multiline_comment[3] + doc_comment[3]
+    return extract_with_tree_sitter(
+        file_path=file,
+        display_language='Dart',
+        parser_language='dart',
+        single_line_prefixes=['///', '//'],
+        multi_line_delimiters=[('/*', '*/')],
     )
-    output.blank_lines = single_line_comment[2]
-
-    if cont_single_line_comment:
-        single_line_comment = cont_single_line_comment[0]
-
-    if cont_doc_line_comment:
-        doc_comment = cont_doc_line_comment[0]
-
-    for i in single_line_comment[0]:
-        output.single_line_comment.append(SingleLine(i[0], i[1]))
-
-    for i in doc_comment[0]:
-        output.single_line_comment.append(SingleLine(i[0], i[1]))
-
-    for idx, _ in enumerate(cont_single_line_comment[1]):
-        output.cont_single_line_comment.append(
-            MultiLine(
-                cont_single_line_comment[1][idx],
-                cont_single_line_comment[2][idx],
-                cont_single_line_comment[3][idx],
-            )
-        )
-
-    for idx, _ in enumerate(cont_doc_line_comment[1]):
-        output.cont_single_line_comment.append(
-            MultiLine(
-                cont_doc_line_comment[1][idx],
-                cont_doc_line_comment[2][idx],
-                cont_doc_line_comment[3][idx],
-            )
-        )
-
-    try:
-        for idx, _ in enumerate(multiline_comment[0]):
-            output.multi_line_comment.append(
-                MultiLine(
-                    multiline_comment[0][idx],
-                    multiline_comment[1][idx],
-                    multiline_comment[2][idx],
-                )
-            )
-    except BaseException:
-        pass
-
-    return output
 
 
 def dartSource(file, new_file: str):
