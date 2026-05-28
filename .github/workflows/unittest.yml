@@ -20,6 +20,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          cache-dependency-path: 'setup.py'
 
       - name: Cache Tree-Sitter parser bundles
         uses: actions/cache@v4
