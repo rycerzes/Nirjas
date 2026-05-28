@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""
+Download Tree-Sitter parser bundles required by Nirjas.
+
+Usage:
+    python3 scripts/download_parsers.py
+    python3 scripts/download_parsers.py --config language-pack.toml
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+from tree_sitter_language_pack import download
+
+
+class ParserDownloadError(Exception):
+    """Raised when parser download config is invalid or download fails."""
+
+
+def parse_language_config(config_path: Path) -> list[str]:
+    """Parse `languages = [ ... ]` list from language-pack.toml."""
+
+    if not config_path.exists():
+        raise ParserDownloadError(f"Config file not found: {config_path}")
+
+    config_text = config_path.read_text(encoding="utf-8")
+    match = re.search(r"languages\s*=\s*\[(.*?)\]", config_text, flags=re.S)
+    if match is None:
+        raise ParserDownloadError(
+            f"Could not find `languages = [ ... ]` in config: {config_path}"
+        )
+
+    languages_raw = match.group(1)
+    languages = []
+    for quoted_value in re.findall(r"['\"]([^'\"]+)['\"]", languages_raw):
+        language_name = quoted_value.strip()
+        if language_name:
+            languages.append(language_name)
+
+    if not languages:
+        raise ParserDownloadError(f"No languages configured in: {config_path}")
+
+    return languages
+
+
+def download_parsers(config_path: Path) -> int:
+    """Download parser bundles from config file and return count."""
+
+    language_names = parse_language_config(config_path)
+
+    try:
+        downloaded = download(language_names)
+    except Exception as exc:  # pragma: no cover - depends on network/runtime
+        raise ParserDownloadError(
+            "Failed to download Tree-Sitter parsers. "
+            f"Languages: {language_names}. Error: {exc}"
+        ) from exc
+
+    return downloaded
+
+
+def main() -> int:
+    """CLI entrypoint."""
+
+    parser = argparse.ArgumentParser(
+        description="Download Tree-Sitter language parsers required by Nirjas",
+    )
+    parser.add_argument(
+        "--config",
+        default="language-pack.toml",
+        help="Path to parser configuration file (default: language-pack.toml)",
+    )
+    args = parser.parse_args()
+
+    config_path = Path(args.config)
+
+    try:
+        downloaded_count = download_parsers(config_path)
+    except ParserDownloadError as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 1
+
+    print(
+        "Tree-Sitter parser download complete. "
+        f"Downloaded/verified parsers: {downloaded_count}"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

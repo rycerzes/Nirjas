@@ -52,7 +52,10 @@ setup(
     keywords='Nirjas,Code Comment, Comment Extractor, Code Comment Extractor,' +
              ' Source Code Extractor, Source Extractor',
     packages=find_packages(),
-    python_requires=">=3",
+    install_requires=[
+        'tree-sitter-language-pack>=1.0.0',
+    ],
+    python_requires=">=3.10",
     entry_points={
         'console_scripts': [
             'nirjas = nirjas.main:run_and_print'

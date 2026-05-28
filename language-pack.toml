@@ -1,0 +1,33 @@
+# Tree-Sitter parser configuration used by Nirjas.
+# Download configured parser bundles with:
+#   python3 scripts/download_parsers.py
+
+languages = [
+    "bash",
+    "c",
+    "csharp",
+    "cpp",
+    "css",
+    "dart",
+    "go",
+    "haskell",
+    "html",
+    "java",
+    "javascript",
+    "julia",
+    "kotlin",
+    "matlab",
+    "perl",
+    "php",
+    "python",
+    "r",
+    "ruby",
+    "rust",
+    "scala",
+    "scss",
+    "shell",
+    "sql",
+    "swift",
+    "typescript",
+    "tsx",
+]
