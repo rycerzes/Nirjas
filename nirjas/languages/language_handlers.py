@@ -114,10 +114,9 @@ class PythonHandler:
         for index in range(parent.child_count()):
             child = parent.child(index)
             if child.kind() != "comment":
-                return (
-                    child.start_byte() == statement.start_byte()
-                    and child.end_byte() == statement.end_byte()
-                )
+                same_start = child.start_byte() == statement.start_byte()
+                same_end = child.end_byte() == statement.end_byte()
+                return same_start and same_end
         return False
 
 
