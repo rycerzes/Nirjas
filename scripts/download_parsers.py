@@ -26,19 +26,17 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import re
+import ast
 import sys
 from pathlib import Path
 
+from nirjas.language_registry import parser_name
 from tree_sitter_language_pack import download
 
-
-_LANGUAGE_ALIASES = {
-    "c#": "csharp",
-    "c_sharp": "csharp",
-    "shell": "bash",
-    "shellscript": "bash",
-}
+try:
+    import tomllib
+except ImportError:  # pragma: no cover - Python 3.10 fallback
+    tomllib = None
 
 
 class ParserDownloadError(Exception):
@@ -46,29 +44,62 @@ class ParserDownloadError(Exception):
 
 
 def parse_language_config(config_path: Path) -> list[str]:
-    """Parse `languages = [ ... ]` list from language-pack.toml."""
+    """Parse configured parser names from language-pack.toml."""
 
     if not config_path.exists():
         raise ParserDownloadError(f"Config file not found: {config_path}")
 
-    config_text = config_path.read_text(encoding="utf-8")
-    match = re.search(r"languages\s*=\s*\[(.*?)\]", config_text, flags=re.S)
-    if match is None:
+    if tomllib is None:
+        config = _parse_minimal_toml(config_path)
+    else:
+        with config_path.open("rb") as config_file:
+            config = tomllib.load(config_file)
+
+    raw_languages = config.get("languages")
+    if not isinstance(raw_languages, list):
         raise ParserDownloadError(
-            f"Could not find `languages = [ ... ]` in config: {config_path}"
+            f"Could not find `languages = [ ... ]` list in config: {config_path}"
         )
 
-    languages_raw = match.group(1)
-    languages = []
-    for quoted_value in re.findall(r"['\"]([^'\"]+)['\"]", languages_raw):
-        language_name = quoted_value.strip()
-        if language_name:
-            languages.append(language_name)
+    languages = [
+        language_name.strip()
+        for language_name in raw_languages
+        if isinstance(language_name, str) and language_name.strip()
+    ]
 
     if not languages:
         raise ParserDownloadError(f"No languages configured in: {config_path}")
 
     return languages
+
+
+def _parse_minimal_toml(config_path: Path) -> dict[str, object]:
+    """Parse the simple top-level TOML list used by Python 3.10 CI."""
+
+    lines = config_path.read_text(encoding="utf-8").splitlines()
+    collecting = False
+    list_lines: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not collecting and stripped.startswith("languages"):
+            _, _, remainder = stripped.partition("=")
+            list_lines.append(remainder.strip())
+            collecting = True
+        elif collecting:
+            list_lines.append(stripped)
+
+        if collecting and "]" in stripped:
+            break
+
+    if not list_lines:
+        return {}
+
+    try:
+        return {"languages": ast.literal_eval("\n".join(list_lines))}
+    except (SyntaxError, ValueError) as exc:
+        raise ParserDownloadError(
+            f"Could not parse `languages` list in config: {config_path}"
+        ) from exc
 
 
 def normalize_language_names(language_names: list[str]) -> list[str]:
@@ -78,7 +109,7 @@ def normalize_language_names(language_names: list[str]) -> list[str]:
     seen_languages: set[str] = set()
 
     for language_name in language_names:
-        normalized_name = _LANGUAGE_ALIASES.get(language_name, language_name)
+        normalized_name = parser_name(language_name)
         if normalized_name in seen_languages:
             continue
         normalized_names.append(normalized_name)
