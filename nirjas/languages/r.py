@@ -22,25 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+R_CONFIG = LanguageConfig(
+    display_language="R",
+    parser_language="r",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("#",),
+    group_contiguous_single_lines=False,
+)
 
 
 def rExtractor(file):
-    """
-    Extract comments from R file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='R',
-        parser_language='r',
-        single_line_prefixes=['#'],
-        multi_line_delimiters=[],
-        group_single_line_comments=False,
-    )
+    return R_CONFIG.extract(file)
 
 
 def rSource(file, new_file: str):

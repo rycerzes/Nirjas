@@ -22,24 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+CSS_CONFIG = LanguageConfig(
+    display_language="CSS",
+    parser_language="css",
+    comment_node_kinds=frozenset({"comment"}),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def cssExtractor(file):
-    """
-    Extract comments from CSS file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='CSS',
-        parser_language='css',
-        single_line_prefixes=[],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return CSS_CONFIG.extract(file)
 
 
 def cssSource(file, new_file: str):

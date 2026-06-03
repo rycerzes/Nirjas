@@ -22,24 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+HTML_CONFIG = LanguageConfig(
+    display_language="HTML",
+    parser_language="html",
+    comment_node_kinds=frozenset({"comment"}),
+    multi_line_delimiters=(("<!--", "-->"), ("/*", "*/"),),
+)
 
 
 def htmlExtractor(file):
-    """
-    Extract comments from HTML file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='HTML',
-        parser_language='html',
-        single_line_prefixes=[],
-        multi_line_delimiters=[('<!--', '-->'), ('/*', '*/')],
-    )
+    return HTML_CONFIG.extract(file)
 
 
 def htmlSource(file, new_file: str):

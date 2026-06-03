@@ -22,24 +22,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+JAVA_CONFIG = LanguageConfig(
+    display_language="Java",
+    parser_language="java",
+    comment_node_kinds=frozenset({"block_comment", "line_comment"}),
+    doc_comment_node_kinds=frozenset({"block_comment"}),
+    single_line_prefixes=("//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def javaExtractor(file):
-    """
-    Extract comments from Java file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Java',
-        parser_language='java',
-        single_line_prefixes=['//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return JAVA_CONFIG.extract(file)
 
 
 def javaSource(file, new_file: str):

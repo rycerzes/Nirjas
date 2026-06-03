@@ -21,24 +21,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+SCSS_CONFIG = LanguageConfig(
+    display_language="Scss",
+    parser_language="scss",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("///", "//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def scssExtractor(file):
-    """
-    Extract comments from Scss file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Scss',
-        parser_language='scss',
-        single_line_prefixes=['///', '//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return SCSS_CONFIG.extract(file)
 
 
 def scssSource(file, new_file: str):

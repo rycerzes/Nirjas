@@ -22,24 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+SWIFT_CONFIG = LanguageConfig(
+    display_language="Swift",
+    parser_language="swift",
+    comment_node_kinds=frozenset({"comment", "multiline_comment"}),
+    single_line_prefixes=("//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def swiftExtractor(file):
-    """
-    Extract comments from Swift file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Swift',
-        parser_language='swift',
-        single_line_prefixes=['//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return SWIFT_CONFIG.extract(file)
 
 
 def swiftSource(file, new_file: str):

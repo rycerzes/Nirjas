@@ -22,24 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+C_SHARP_CONFIG = LanguageConfig(
+    display_language="C#",
+    parser_language="c_sharp",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def c_sharpExtractor(file):
-    """
-    Extract comments from C# file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='C#',
-        parser_language='csharp',
-        single_line_prefixes=['//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return C_SHARP_CONFIG.extract(file)
 
 
 def c_sharpSource(file, new_file: str):

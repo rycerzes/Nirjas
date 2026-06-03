@@ -22,24 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+RUBY_CONFIG = LanguageConfig(
+    display_language="Ruby",
+    parser_language="ruby",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("#",),
+    multi_line_delimiters=(("=begin", "=end"),),
+)
 
 
 def rubyExtractor(file):
-    """
-    Extract comments from Ruby file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Ruby',
-        parser_language='ruby',
-        single_line_prefixes=['#'],
-        multi_line_delimiters=[('=begin', '=end')],
-    )
+    return RUBY_CONFIG.extract(file)
 
 
 def rubySource(file, new_file: str):

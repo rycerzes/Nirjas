@@ -17,24 +17,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+SQL_CONFIG = LanguageConfig(
+    display_language="SQL",
+    parser_language="sql",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("--",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def sqlExtractor(file):
-    """
-    Extract comments from SQL file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='SQL',
-        parser_language='sql',
-        single_line_prefixes=['--'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return SQL_CONFIG.extract(file)
 
 
 def sqlSource(file, new_file: str):

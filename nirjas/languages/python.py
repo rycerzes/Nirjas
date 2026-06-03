@@ -22,27 +22,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+PYTHON_CONFIG = LanguageConfig(
+    display_language="Python",
+    parser_language="python",
+    comment_node_kinds=frozenset({"comment"}),
+    doc_comment_node_kinds=frozenset({"string"}),
+    single_line_prefixes=("#",),
+    multi_line_delimiters=(("'''", "'''"), ('"""', '"""')),
+    handler_name="python",
+)
 
 
 def pythonExtractor(file):
-    """
-    Extract comments from Python file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Python',
-        parser_language='python',
-        single_line_prefixes=['#'],
-        multi_line_delimiters=[("'''", "'''"), ('"""', '"""')],
-        docstring_node_kinds=['string'],
-        docstring_parent_kinds=['module', 'block'],
-        docstring_delimiters=[("'''", "'''"), ('"""', '"""')],
-    )
+    return PYTHON_CONFIG.extract(file)
 
 
 def pythonSource(file, new_file: str):

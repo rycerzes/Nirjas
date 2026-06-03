@@ -22,24 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+SHELL_CONFIG = LanguageConfig(
+    display_language="Shell",
+    parser_language="shell",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("#",),
+)
 
 
 def shellExtractor(file):
-    """
-    Extract comments from Shell file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Shell',
-        parser_language='shell',
-        single_line_prefixes=['#'],
-        multi_line_delimiters=[],
-    )
+    return SHELL_CONFIG.extract(file)
 
 
 def shellSource(file, new_file: str):

@@ -21,27 +21,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+JULIA_CONFIG = LanguageConfig(
+    display_language="Julia",
+    parser_language="julia",
+    comment_node_kinds=frozenset({"line_comment"}),
+    single_line_prefixes=("#",),
+    multi_line_delimiters=(("#=", "=#"), ("'''", "'''"), ('"""', '"""')),
+)
 
 
 def juliaExtractor(file):
-    """
-    Extract comments from Julia file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Julia',
-        parser_language='julia',
-        single_line_prefixes=['#'],
-        multi_line_delimiters=[('#=', '=#'), ("'''", "'''"), ('"""', '"""')],
-        docstring_node_kinds=['string_literal'],
-        docstring_parent_kinds=['source_file', 'block'],
-        docstring_delimiters=[("'''", "'''"), ('"""', '"""')],
-    )
+    return JULIA_CONFIG.extract(file)
 
 
 def juliaSource(file, new_file: str):

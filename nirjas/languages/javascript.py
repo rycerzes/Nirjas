@@ -22,24 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+JAVASCRIPT_CONFIG = LanguageConfig(
+    display_language="JavaScript",
+    parser_language="javascript",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def javascriptExtractor(file):
-    """
-    Extract comments from JavaScript file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='JavaScript',
-        parser_language='javascript',
-        single_line_prefixes=['//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return JAVASCRIPT_CONFIG.extract(file)
 
 
 def javascriptSource(file, new_file: str):

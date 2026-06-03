@@ -22,24 +22,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+RUST_CONFIG = LanguageConfig(
+    display_language="Rust",
+    parser_language="rust",
+    comment_node_kinds=frozenset({"block_comment", "doc_comment", "inner_doc_comment", "line_comment", "outer_doc_comment"}),
+    doc_comment_node_kinds=frozenset({"doc_comment", "inner_doc_comment", "outer_doc_comment"}),
+    single_line_prefixes=("///", "//!", "//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def rustExtractor(file):
-    """
-    Extract comments from Rust file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Rust',
-        parser_language='rust',
-        single_line_prefixes=['//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return RUST_CONFIG.extract(file)
 
 
 def rustSource(file, new_file: str):

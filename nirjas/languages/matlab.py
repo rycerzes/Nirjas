@@ -22,24 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+MATLAB_CONFIG = LanguageConfig(
+    display_language="MATLAB",
+    parser_language="matlab",
+    comment_node_kinds=frozenset({"comment"}),
+    single_line_prefixes=("%",),
+    multi_line_delimiters=(("%{", "%}"),),
+)
 
 
 def matlabExtractor(file):
-    """
-    Extract comments from MATLAB file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='MATLAB',
-        parser_language='matlab',
-        single_line_prefixes=['%'],
-        multi_line_delimiters=[('%{', '%}')],
-    )
+    return MATLAB_CONFIG.extract(file)
 
 
 def matlabSource(file, new_file: str):

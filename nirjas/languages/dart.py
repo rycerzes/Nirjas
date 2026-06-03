@@ -21,24 +21,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+DART_CONFIG = LanguageConfig(
+    display_language="Dart",
+    parser_language="dart",
+    comment_node_kinds=frozenset({"comment"}),
+    doc_comment_node_kinds=frozenset({"documentation_comment"}),
+    single_line_prefixes=("///", "//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def dartExtractor(file):
-    """
-    Extract comments from Dart file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Dart',
-        parser_language='dart',
-        single_line_prefixes=['///', '//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return DART_CONFIG.extract(file)
 
 
 def dartSource(file, new_file: str):

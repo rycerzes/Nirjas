@@ -22,24 +22,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+SCALA_CONFIG = LanguageConfig(
+    display_language="Scala",
+    parser_language="scala",
+    comment_node_kinds=frozenset({"block_comment", "comment"}),
+    doc_comment_node_kinds=frozenset({"block_comment"}),
+    single_line_prefixes=("//",),
+    multi_line_delimiters=(("/*", "*/"),),
+)
 
 
 def scalaExtractor(file):
-    """
-    Extract comments from Scala file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Scala',
-        parser_language='scala',
-        single_line_prefixes=['//'],
-        multi_line_delimiters=[('/*', '*/')],
-    )
+    return SCALA_CONFIG.extract(file)
 
 
 def scalaSource(file, new_file: str):

@@ -22,26 +22,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 
-from nirjas.languages._base import extract_with_tree_sitter
+from nirjas.languages.language_config import LanguageConfig
+
+
+PERL_CONFIG = LanguageConfig(
+    display_language="Perl",
+    parser_language="perl",
+    comment_node_kinds=frozenset({"comment", "pod"}),
+    single_line_prefixes=("#",),
+    multi_line_delimiters=(("=begin", "=cut"), ("=pod", "=cut"),),
+)
 
 
 def perlExtractor(file):
-    """
-    Extract comments from Perl file.
-    :param file: File to scan
-    :type file: string
-    :return: Scan output
-    :rtype: ScanOutput
-    """
-    return extract_with_tree_sitter(
-        file_path=file,
-        display_language='Perl',
-        parser_language='perl',
-        single_line_prefixes=['#'],
-        multi_line_delimiters=[('=begin', '=cut'), ('=pod', '=cut')],
-        extra_comment_node_kinds=['pod'],
-        force_multi_line_node_kinds=['pod'],
-    )
+    return PERL_CONFIG.extract(file)
 
 
 def perlSource(file, new_file: str):
