@@ -27,8 +27,7 @@ from nirjas.languages.language_config import LanguageConfig
 DART_CONFIG = LanguageConfig(
     display_language="Dart",
     parser_language="dart",
-    comment_node_kinds=frozenset({"comment"}),
-    doc_comment_node_kinds=frozenset({"documentation_comment"}),
+    comment_node_kinds=frozenset({"comment", "documentation_comment"}),
     single_line_prefixes=("///", "//",),
     multi_line_delimiters=(("/*", "*/"),),
 )

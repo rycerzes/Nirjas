@@ -28,8 +28,7 @@ from nirjas.languages.language_config import LanguageConfig
 KOTLIN_CONFIG = LanguageConfig(
     display_language="Kotlin",
     parser_language="kotlin",
-    comment_node_kinds=frozenset({"block_comment", "line_comment"}),
-    doc_comment_node_kinds=frozenset({"block_comment"}),
+    comment_node_kinds=frozenset({"block_comment", "line_comment", "multiline_comment"}),
     single_line_prefixes=("//",),
     multi_line_delimiters=(("/*", "*/"),),
 )
