@@ -39,23 +39,4 @@ def rExtractor(file):
 
 
 def rSource(file, new_file: str):
-    """
-    Extract source from R file and put at new_file.
-    :param file: File to process
-    :type file: string
-    :param new_file: File to put source at
-    :type new_file: string
-    :return: Path to new file
-    :rtype: string
-    """
-    with open(new_file, "w+") as f1:
-        with open(file) as f:
-            for line in f:
-                content = line
-                if "#" in line:
-                    content = line[: line.find("#")].rstrip() + "\n"
-                if content.strip() != "":
-                    f1.write(content)
-    f.close()
-    f1.close()
-    return new_file
+    return R_CONFIG.strip_source(file, new_file)

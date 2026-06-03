@@ -40,43 +40,4 @@ def javaExtractor(file):
 
 
 def javaSource(file, new_file: str):
-    """
-    Extract source from Java file and put at new_file.
-    :param file: File to process
-    :type file: string
-    :param new_file: File to put source at
-    :type new_file: string
-    :return: Path to new file
-    :rtype: string
-    """
-    copy = True
-    with open(new_file, "w+") as f1:
-        with open(file) as f:
-            for line in f:
-                content = ""
-                found = False
-                if "/*" in line:
-                    pos = line.find("/*")
-                    content = line[:pos].rstrip()
-                    line = line[pos:]
-                    copy = False
-                    found = True
-                if "*/" in line:
-                    content = content + line[line.rfind("*/") + 2:]
-                    line = content
-                    copy = True
-                    found = True
-                if "//" in line:
-                    if line[line.find("//") - 1] != ":":
-                        line = line[: line.find("//")].rstrip() + "\n"
-                    elif line[line.rfind("//") - 1] != ":":
-                        line = line[: line.rfind("//")].rstrip() + "\n"
-                    content = line
-                    found = True
-                if not found:
-                    content = line
-                if copy and content.strip() != "":
-                    f1.write(content)
-    f.close()
-    f1.close()
-    return new_file
+    return JAVA_CONFIG.strip_source(file, new_file)
