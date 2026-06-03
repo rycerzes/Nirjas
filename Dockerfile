@@ -31,7 +31,9 @@ WORKDIR /nirjas
 
 COPY . .
 
-RUN python3 -m pip wheel --wheel-dir wheels .
+RUN python3 -m pip install . \
+ && python3 scripts/download_parsers.py \
+ && python3 -m pip wheel --wheel-dir wheels .
 
 FROM python:3.10-alpine
 

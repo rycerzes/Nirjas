@@ -13,17 +13,17 @@ jobs:
     name: Unit Tests on Python ${{ matrix.python-version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: 'setup.py'
 
       - name: Cache Tree-Sitter parser bundles
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/tree-sitter-language-pack
           key: >-
